@@ -69,6 +69,7 @@ function module:play(welds)
 						if ind == #kfs and self.looped then
 							task.spawn(function()
 								wait(timeDiff)
+								if anims[char] ~= id then return end
 								self:play(welds)
 							end)
 							return
