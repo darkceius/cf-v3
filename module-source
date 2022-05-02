@@ -63,6 +63,8 @@ function module:playv2(welds:{})
 
 	local kfs = data:GetKeyframes()
 	
+	print("v2!!!")
+	
 	for ind = 0, (#kfs) do
 		local v = kfs[ind]
 		
