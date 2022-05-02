@@ -1,6 +1,6 @@
 -- "CFrame" Animator V3
 -- by Darkceius/Darknoob193
--- updated version: v3.02a
+-- updated version: v3.03a
 
 --/ Services
 local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
@@ -114,11 +114,62 @@ function module:play(welds:{})
 
 end
 
-function module.new(character: Model, keyframeSequence:KeyframeSequence|any)
+function module.keyframeToString(keyframeSequence:KeyframeSequence)
+	local res = "{".. string.format("Properties={Looped=%s};", tostring(keyframeSequence.Loop))
+	local frames = keyframeSequence:GetKeyframes()
+	
+	for i: number,v in pairs(frames) do
+		local ks = ""
+		local descendants:{} = v:GetDescendants()
+		for ind,g in pairs(descendants) do
+			if g:IsA("Pose") then
+				local name = string.gsub(g.Name, "'", "\'")
+				local cf = string.format("CFrame.new(%s)", tostring(g.CFrame))
+				local fr = string.format(("['%s']={%s, '%s','%s'}".. ((ind==#descendants) and "" or ";")), name, cf, tostring(g.EasingStyle.Name), tostring(g.EasingDirection.Name))
+				ks = ks .. fr
+			end
+		end
+		
+		local data = string.format(("[%s]={%s}"..(i==#frames and "" or ";")) .. "\n", v.Time, ks)
+		res = res .. data
+	end
+	
+	res = res .. "}"
+	return res
+end
+
+function module.tableToKeyframe(keyframeData:{})
+	local main = Instance.new("KeyframeSequence")
+	
+	for time, data in pairs(keyframeData) do
+		if tonumber(time) then
+			local a = Instance.new("Keyframe")
+			a.Time = tonumber(time)
+			
+			for i,v in pairs(data) do
+				local pose = Instance.new("Pose", a)
+				pose.Name = i
+				pose.CFrame = v[1]
+				pose.EasingStyle = Enum.PoseEasingStyle[v[2]]
+				pose.EasingDirection = Enum.PoseEasingDirection[v[3]]
+			end
+			
+			a.Parent = main
+		elseif time == "Properties" then
+			main.Loop = data.Looped
+		end
+	end
+	
+	return main
+end
+
+function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{})
 	assert(keyframeSequence, "<KeyframeSequence|string>keyframeSequence is nil.")
 
-	if not typeof(keyframeSequence) == "instance" then
+	if not typeof(keyframeSequence) == "instance" and typeof(keyframeSequence) ~= "table" then
 		keyframeSequence = (keyframeSequenceProvider:GetKeyframeSequenceAsync(keyframeSequence) or error("Couldn't download keyframesequence data from id."))
+	elseif typeof(keyframeSequence) == "table" then
+		keyframeSequence = module.tableToKeyframe(keyframeSequence)
 	end
 
 	if not keyframeSequence:IsA("KeyframeSequence") then
