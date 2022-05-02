@@ -15,7 +15,7 @@ module.__index = module
 
 function module:Destroy(welds:{}?)
 	anims[self.char] = {}
-	
+
 	self:stop(welds)
 	self.char = nil
 	self.looped = nil
@@ -46,7 +46,7 @@ end
 function module:stop(welds:{}) 
 	welds = welds or self:getWeldsAndC0()
 	anims[self.char] = {}
-	
+
 	for i,v in pairs(welds) do
 		tween:Create(v[1], TweenInfo.new(0.06), {C0=v[2]}):Play()
 	end
@@ -65,13 +65,13 @@ function module:playv2(welds:{})
 
 	for ind = 0, (#kfs) do
 		local v = kfs[ind]
-		
+
 		if anims[char] ~= id then return end
 
 		task.spawn(function()
 			wait((v and v.Time or 0))
 			if anims[char] ~= id then return end
-			
+
 			for _, a in pairs(((v or kfs[ind+1] or kfs[1])):GetDescendants()) do
 				if a:IsA("Pose") then
 					local d = welds[a.Name]
@@ -109,9 +109,9 @@ function module:playv2(welds:{})
 			end
 
 		end)
-		
+
 	end
-	
+
 end
 
 function module:play(welds:{})
@@ -137,7 +137,7 @@ function module:play(welds:{})
 					local d = welds[a.Name]
 					if d then
 						if anims[char] ~= id then return end
-						
+
 						local timeDiff = (kfs[ind+1] and (kfs[ind+1].Time-v.Time) or kfs[1].Time)/(tonumber(self.speed) or 1)
 						local easingStyle = (a.EasingStyle or Enum.EasingStyle.Linear)
 						local easingDirection = (a.EasingDirection or Enum.EasingDirection.In)
@@ -176,7 +176,7 @@ end
 function module.keyframeToString(keyframeSequence:KeyframeSequence)
 	local res = "{".. string.format("Properties={Looped=%s};", tostring(keyframeSequence.Loop))
 	local frames = keyframeSequence:GetKeyframes()
-	
+
 	for i: number,v in pairs(frames) do
 		local ks = ""
 		local descendants:{} = v:GetDescendants()
@@ -188,23 +188,23 @@ function module.keyframeToString(keyframeSequence:KeyframeSequence)
 				ks = ks .. fr
 			end
 		end
-		
+
 		local data = string.format(("[%s]={%s}"..(i==#frames and "" or ";")) .. "\n", v.Time, ks)
 		res = res .. data
 	end
-	
+
 	res = res .. "}"
 	return res
 end
 
 function module.tableToKeyframe(keyframeData:{})
 	local main = Instance.new("KeyframeSequence")
-	
+
 	for time, data in pairs(keyframeData) do
 		if tonumber(time) then
 			local a = Instance.new("Keyframe")
 			a.Time = tonumber(time)
-			
+
 			for i,v in pairs(data) do
 				local pose = Instance.new("Pose", a)
 				pose.Name = i
@@ -212,13 +212,13 @@ function module.tableToKeyframe(keyframeData:{})
 				pose.EasingStyle = Enum.PoseEasingStyle[v[2]]
 				pose.EasingDirection = Enum.PoseEasingDirection[v[3]]
 			end
-			
+
 			a.Parent = main
 		elseif time == "Properties" then
 			main.Loop = data.Looped
 		end
 	end
-	
+
 	return main
 end
 
@@ -238,10 +238,10 @@ function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{}, 
 	local self = {}
 	self.data = keyframeSequence
 	self.char = character
-	if typeof(loop) ~= "boolean" then
-		self.looped = (keyframeSequence.Loop)
-	else
+	if loop ~= nil then
 		self.looped = loop
+	else
+		self.looped = (keyframeSequence.Loop)
 	end
 	self.speed = 1
 	self.autostop = true
