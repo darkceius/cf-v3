@@ -90,7 +90,7 @@ function module:playv2(welds:{})
 							C0 = d[2] * a.CFrame
 						}):Play()
 
-						if ind == #kfs and self.looped then
+						if ind == #kfs then
 							task.spawn(function()
 								wait(timeDiff)
 								if anims[char] ~= id then return end
@@ -150,7 +150,7 @@ function module:play(welds:{})
 							C0 = d[2] * a.CFrame
 						}):Play()
 
-						if ind == #kfs and self.looped then
+						if ind == #kfs then
 							task.spawn(function()
 								wait(timeDiff)
 								if anims[char] ~= id then return end
