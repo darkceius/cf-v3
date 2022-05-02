@@ -63,7 +63,7 @@ function module:playv2(welds:{})
 
 	local kfs = data:GetKeyframes()
 	
-	for ind = 0, kfs do
+	for ind = 0, (#kfs) do
 		local v = kfs[ind]
 		
 		if anims[char] ~= id then return end
