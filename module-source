@@ -1,6 +1,6 @@
 -- "CFrame" Animator V3
 -- by Darkceius/Darknoob193
--- updated version: v3.03a
+-- updated version: v3.02a
 
 --/ Services
 local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
@@ -23,8 +23,6 @@ function module:Destroy(welds:{}?)
 	self.data = nil
 	self.speed = nil
 	self = nil
-	
-	return self
 end
 
 function module:getWeldsAndC0()
@@ -95,8 +93,8 @@ function module:play(welds:{})
 
 								if self.looped then
 									self:play(welds)
-								elseif self.autostop ~= false then
-									self:stop()
+								else
+									self:stop(welds)
 								end
 
 							end)
