@@ -1,6 +1,10 @@
 -- "CFrame" Animator V3
 -- by Darkceius/Darknoob193
 -- updated version: v3.01a
+--todo
+-- stop needs to reset c0, play finished no loop too!!!! 
+
+
 --/ Services
 local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
 local tween = game:GetService("TweenService")
