@@ -161,8 +161,6 @@ function module:play(welds:{})
 								wait(timeDiff)
 								if anims[char] ~= id then return end
 								
-								print(self)
-								
 								if self.looped == true then
 									if anims[char] ~= id then return end
 									self:play(welds)
@@ -254,11 +252,10 @@ function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{}, 
 	local self = {}
 	self.data = keyframeSequence
 	self.char = character
-	self.looped = true
+	self.looped = (keyframeSequence.Loop)
 	if looped ~= nil then
 		self.looped = looped
 	end
-	print("set looped as",self.looped)
 	self.speed = 1
 	self.autostop = true
 	setmetatable(self, module)
