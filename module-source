@@ -225,16 +225,20 @@ end
 function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{}, loop)
 	assert(keyframeSequence, "<KeyframeSequence|string>keyframeSequence is nil.")
 
-	if not typeof(keyframeSequence) == "instance" and typeof(keyframeSequence) ~= "table" then
+	if not typeof(keyframeSequence) == "Instance" and typeof(keyframeSequence) ~= "table" then
 		keyframeSequence = (keyframeSequenceProvider:GetKeyframeSequenceAsync(keyframeSequence) or error("Couldn't download keyframesequence data from id."))
-	elseif typeof(keyframeSequence) == "table" then
+	end
+	
+	if typeof(keyframeSequence) == "table" then
 		keyframeSequence = module.tableToKeyframe(keyframeSequence)
 	end
-
-	if not keyframeSequence:IsA("KeyframeSequence") then
-		error("Couldn't get keyframesequence.")
+	
+	if typeof(keyframeSequence) == "Instance" then
+		if not keyframeSequence:IsA("KeyframeSequence") then
+			error("Couldn't get keyframesequence.")
+		end
 	end
-
+	
 	local self = {}
 	self.data = keyframeSequence
 	self.char = character
