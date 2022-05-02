@@ -1,6 +1,6 @@
 -- "CFrame" Animator V3
 -- by Darkceius/Darknoob193
-
+-- updated version: v3.01a
 --/ Services
 local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
 local tween = game:GetService("TweenService")
