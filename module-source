@@ -62,9 +62,7 @@ function module:playv2(welds:{})
 	local threads = {}
 
 	local kfs = data:GetKeyframes()
-	
-	print("v2!!!")
-	
+
 	for ind = 0, (#kfs) do
 		local v = kfs[ind]
 		
