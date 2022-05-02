@@ -71,7 +71,7 @@ function module:playv2(welds:{})
 		if anims[char] ~= id then return end
 
 		task.spawn(function()
-			wait((v and v.Time or 0))
+			wait((v and v.Time or 0)/(tonumber(self.speed) or 1))
 			if anims[char] ~= id then return end
 
 			for _, a in pairs(((v or kfs[ind+1] or kfs[1])):GetDescendants()) do
@@ -96,7 +96,7 @@ function module:playv2(welds:{})
 								if anims[char] ~= id then return end
 
 								if self.looped then
-									self:play(welds)
+									self:playv2(welds)
 								else
 									self:stop(welds)
 								end
@@ -131,7 +131,7 @@ function module:play(welds:{})
 		if anims[char] ~= id then return end
 
 		task.spawn(function()
-			wait(v.Time)
+			wait(v.Time/(tonumber(self.speed) or 1))
 			if anims[char] ~= id then return end
 
 			for _, a in pairs(v:GetDescendants()) do
@@ -154,7 +154,9 @@ function module:play(welds:{})
 							task.spawn(function()
 								wait(timeDiff)
 								if anims[char] ~= id then return end
-
+								
+								print(self.looped)
+								
 								if self.looped then
 									self:play(welds)
 								else
@@ -224,7 +226,7 @@ function module.tableToKeyframe(keyframeData:{})
 	return main
 end
 
-function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{}, loop)
+function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{})
 	assert(keyframeSequence, "<KeyframeSequence|string>keyframeSequence is nil.")
 
 	if typeof(keyframeSequence) == "string" then
@@ -244,11 +246,7 @@ function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{}, 
 	local self = {}
 	self.data = keyframeSequence
 	self.char = character
-	if loop ~= nil then
-		self.looped = loop
-	else
-		self.looped = (keyframeSequence.Loop)
-	end
+	self.looped = (keyframeSequence.Loop)
 	self.speed = 1
 	self.autostop = true
 	setmetatable(self, module)
