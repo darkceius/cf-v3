@@ -99,7 +99,7 @@ function module:playv2(welds:{})
 								if self.looped == true then
 									if anims[char] ~= id then return end
 									self:play(welds)
-								elseif self.looped == false then
+								elseif self.looped == false  and self.autostop == true then
 									if anims[char] ~= id then return end
 									self:stop(welds)
 								end
@@ -164,7 +164,7 @@ function module:play(welds:{})
 								if self.looped == true then
 									if anims[char] ~= id then return end
 									self:play(welds)
-								elseif self.looped == false then
+								elseif self.looped == false and self.autostop == true then
 									if anims[char] ~= id then return end
 									self:stop(welds)
 								end
