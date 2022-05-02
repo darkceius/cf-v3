@@ -13,9 +13,24 @@ local anims = {}
 local module = {}
 module.__index = module
 
+function module:Destroy(welds:{}?)
+	anims[self.char] = {}
+	
+	self:stop(welds)
+	self.char = nil
+	self.looped = nil
+	self.autostop = nil
+	self.data = nil
+	self.speed = nil
+	self = nil
+	
+	setmetatable(self, {})
+	return self
+end
+
 function module:getWeldsAndC0()
 	local t = {}
-	
+
 	for i,v: Motor6D in pairs(self.char:GetDescendants()) do
 		if v:IsA("Motor6D") or v:IsA("Weld") then
 			local normal = (c0Saves[v] or (function()
@@ -23,39 +38,37 @@ function module:getWeldsAndC0()
 				c0Saves[v]=a
 				return a
 			end)())
-			
+
 			t[v.Part1.Name]={v, normal}
 		end
 	end
-	
+
 	return t
 end
 
-function module:stop(welds) 
-        welds = welds or self:getWeldsAndC0()
+function module:stop(welds:{}) 
+	welds = welds or self:getWeldsAndC0()
 	anims[self.char] = {}
-	
-	
 	
 	for i,v in pairs(welds) do
 		tween:Create(v[1], TweenInfo.new(0.06), {C0=v[2]}):Play()
 	end
 end
 
-function module:play(welds)
+function module:play(welds:{})
 	welds = welds or self:getWeldsAndC0()
 	local char:Model, data:KeyframeSequence = self.char, self.data
-	
+
 	local id = {}
 	anims[char] = id
-	
+
 	local threads = {}
-	
+
 	local kfs = data:GetKeyframes()
-	
+
 	for ind,v in pairs(kfs) do
 		if anims[char] ~= id then return end
-		
+
 		task.spawn(function()
 			wait(v.Time)
 			if anims[char] ~= id then return end
@@ -64,52 +77,54 @@ function module:play(welds)
 				if a:IsA("Pose") then
 					local d = welds[a.Name]
 					if d then
+						if anims[char] ~= id then return end
+						
 						local timeDiff = (kfs[ind+1] and (kfs[ind+1].Time-v.Time) or kfs[1].Time)/(tonumber(self.speed) or 1)
 						local easingStyle = (a.EasingStyle or Enum.EasingStyle.Linear)
 						local easingDirection = (a.EasingDirection or Enum.EasingDirection.In)
 
 						local tInfo = TweenInfo.new(timeDiff, Enum.EasingStyle[easingStyle.Name], Enum.EasingDirection[easingDirection.Name])
-						
+
 						tween:Create(d[1], tInfo, {
 							C0 = d[2] * a.CFrame
 						}):Play()
-						
+
 						if ind == #kfs and self.looped then
 							task.spawn(function()
 								wait(timeDiff)
 								if anims[char] ~= id then return end
-								
+
 								if self.looped then
 									self:play(welds)
 								elseif self.autostop ~= false then
 									self:stop()
 								end
-								
+
 							end)
-							
+
 							return
-							
+
 						end
 					end
 				end
 			end
-			
+
 		end)
 	end
-	
+
 end
 
 function module.new(character: Model, keyframeSequence:KeyframeSequence|any)
 	assert(keyframeSequence, "<KeyframeSequence|string>keyframeSequence is nil.")
-	
+
 	if not typeof(keyframeSequence) == "instance" then
 		keyframeSequence = (keyframeSequenceProvider:GetKeyframeSequenceAsync(keyframeSequence) or error("Couldn't download keyframesequence data from id."))
 	end
-	
+
 	if not keyframeSequence:IsA("KeyframeSequence") then
 		error("Couldn't get keyframesequence.")
 	end
-	
+
 	local self = {}
 	self.data = keyframeSequence
 	self.char = character
@@ -117,7 +132,7 @@ function module.new(character: Model, keyframeSequence:KeyframeSequence|any)
 	self.speed = 1
 	self.autostop = true
 	setmetatable(self, module)
-	
+
 	return self
 end
 
