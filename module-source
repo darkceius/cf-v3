@@ -96,9 +96,11 @@ function module:playv2(welds:{})
 								wait(timeDiff)
 								if anims[char] ~= id then return end
 
-								if self.looped then
-									self:playv2(welds)
-								else
+								if self.looped == true then
+									if anims[char] ~= id then return end
+									self:play(welds)
+								elseif self.looped == false then
+									if anims[char] ~= id then return end
 									self:stop(welds)
 								end
 
@@ -107,6 +109,8 @@ function module:playv2(welds:{})
 							return
 
 						end
+						
+						
 					end
 				end
 			end
@@ -157,12 +161,12 @@ function module:play(welds:{})
 								wait(timeDiff)
 								if anims[char] ~= id then return end
 								
-								print(self.looped)
+								print(self)
 								
-								if self.looped then
+								if self.looped == true then
 									if anims[char] ~= id then return end
 									self:play(welds)
-								else
+								elseif self.looped == false then
 									if anims[char] ~= id then return end
 									self:stop(welds)
 								end
