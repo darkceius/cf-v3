@@ -36,7 +36,9 @@ function module:getWeldsAndC0()
 				return a
 			end)())
 
-			t[v.Part1.Name]={v, normal}
+			if v.Part1 then
+				t[v.Part1.Name]={v, normal}
+			end
 		end
 	end
 
