@@ -1,9 +1,6 @@
 -- "CFrame" Animator V3
 -- by Darkceius/Darknoob193
--- updated version: v3.01a
---todo
--- stop needs to reset c0, play finished no loop too!!!! 
-
+-- updated version: v3.02a
 
 --/ Services
 local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
@@ -36,6 +33,12 @@ end
 
 function module:stop()
 	anims[self.char] = {}
+	
+	local welds = self:getWeldsAndC0()
+	
+	for i,v in pairs(welds) do
+		tween:Create(v[1], TweenInfo.new(0.06), {C0=v[2]}):Play()
+	end
 end
 
 function module:play(welds)
@@ -74,9 +77,17 @@ function module:play(welds)
 							task.spawn(function()
 								wait(timeDiff)
 								if anims[char] ~= id then return end
-								self:play(welds)
+								
+								if self.looped then
+									self:play(welds)
+								elseif self.autostop ~= false then
+									self:stop()
+								end
+								
 							end)
+							
 							return
+							
 						end
 					end
 				end
@@ -103,6 +114,7 @@ function module.new(character: Model, keyframeSequence:KeyframeSequence|any)
 	self.char = character
 	self.looped = (keyframeSequence.Loop)
 	self.speed = 1
+	self.autostop = true
 	setmetatable(self, module)
 	
 	return self
