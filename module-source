@@ -92,6 +92,7 @@ function module:playv2(welds:{})
 
 						if ind == #kfs then
 							task.spawn(function()
+								if anims[char] ~= id then return end
 								wait(timeDiff)
 								if anims[char] ~= id then return end
 
@@ -152,14 +153,17 @@ function module:play(welds:{})
 
 						if ind == #kfs then
 							task.spawn(function()
+								if anims[char] ~= id then return end
 								wait(timeDiff)
 								if anims[char] ~= id then return end
 								
 								print(self.looped)
 								
 								if self.looped then
+									if anims[char] ~= id then return end
 									self:play(welds)
 								else
+									if anims[char] ~= id then return end
 									self:stop(welds)
 								end
 
