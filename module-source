@@ -226,7 +226,7 @@ function module.tableToKeyframe(keyframeData:{})
 	return main
 end
 
-function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{})
+function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{}, looped)
 	assert(keyframeSequence, "<KeyframeSequence|string>keyframeSequence is nil.")
 
 	if typeof(keyframeSequence) == "string" then
@@ -246,7 +246,11 @@ function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{})
 	local self = {}
 	self.data = keyframeSequence
 	self.char = character
-	self.looped = (keyframeSequence.Loop)
+	self.looped = true
+	if looped ~= nil then
+		self.looped = looped
+	end
+	print("set looped as",self.looped)
 	self.speed = 1
 	self.autostop = true
 	setmetatable(self, module)
