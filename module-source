@@ -1,6 +1,6 @@
 -- "CFrame" Animator V3
 -- by Darkceius/Darknoob193
--- updated version: v3.02a
+-- updated version: v3.04a
 
 --/ Services
 local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
@@ -50,6 +50,68 @@ function module:stop(welds:{})
 	for i,v in pairs(welds) do
 		tween:Create(v[1], TweenInfo.new(0.06), {C0=v[2]}):Play()
 	end
+end
+
+function module:playv2(welds:{})
+	welds = welds or self:getWeldsAndC0()
+	local char:Model, data:KeyframeSequence = self.char, self.data
+
+	local id = {}
+	anims[char] = id
+
+	local threads = {}
+
+	local kfs = data:GetKeyframes()
+	
+	for ind = 0, kfs do
+		local v = kfs[ind]
+		
+		if anims[char] ~= id then return end
+
+		task.spawn(function()
+			wait((v and v.Time or 0))
+			if anims[char] ~= id then return end
+			
+			for _, a in pairs(((v or kfs[ind+1] or kfs[1])):GetDescendants()) do
+				if a:IsA("Pose") then
+					local d = welds[a.Name]
+					if d then
+						if anims[char] ~= id then return end
+
+						local timeDiff = (kfs[ind+1] and (kfs[ind+1].Time-(v and v.Time or 0)) or kfs[1].Time)/(tonumber(self.speed) or 1)
+						local easingStyle = (a.EasingStyle or Enum.EasingStyle.Linear)
+						local easingDirection = (a.EasingDirection or Enum.EasingDirection.In)
+
+						local tInfo = TweenInfo.new(timeDiff, Enum.EasingStyle[easingStyle.Name], Enum.EasingDirection[easingDirection.Name])
+
+						tween:Create(d[1], tInfo, {
+							C0 = d[2] * a.CFrame
+						}):Play()
+
+						if ind == #kfs and self.looped then
+							task.spawn(function()
+								wait(timeDiff)
+								if anims[char] ~= id then return end
+
+								if self.looped then
+									self:play(welds)
+								else
+									self:stop(welds)
+								end
+
+							end)
+
+							return
+
+						end
+					end
+				end
+			end
+
+		end)
+		
+	end
+	
 end
 
 function module:play(welds:{})
