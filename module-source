@@ -160,7 +160,7 @@ function module.tableToKeyframe(keyframeData:{})
 	return main
 end
 
-function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{})
+function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{}, loop)
 	assert(keyframeSequence, "<KeyframeSequence|string>keyframeSequence is nil.")
 
 	if not typeof(keyframeSequence) == "instance" and typeof(keyframeSequence) ~= "table" then
@@ -176,7 +176,11 @@ function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{})
 	local self = {}
 	self.data = keyframeSequence
 	self.char = character
-	self.looped = (keyframeSequence.Loop)
+	if typeof(loop) ~= "boolean" then
+		self.looped = (keyframeSequence.Loop)
+	else
+		self.looped = loop
+	end
 	self.speed = 1
 	self.autostop = true
 	setmetatable(self, module)
