@@ -31,10 +31,11 @@ function module:getWeldsAndC0()
 	return t
 end
 
-function module:stop()
+function module:stop(welds) 
+        welds = welds or self:getWeldsAndC0()
 	anims[self.char] = {}
 	
-	local welds = self:getWeldsAndC0()
+	
 	
 	for i,v in pairs(welds) do
 		tween:Create(v[1], TweenInfo.new(0.06), {C0=v[2]}):Play()
