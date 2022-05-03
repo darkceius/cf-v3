@@ -113,7 +113,7 @@ function module:playv2(welds:{})
 	
 	task.spawn(function()
 		if anims[char] ~= id then return end
-		wait(self.time)
+		wait(self.time/(tonumber(self.speed) or 1))
 		if anims[char] ~= id then return end
 
 		if self.looped == true then
@@ -175,7 +175,7 @@ function module:play(welds:{})
 
 	task.spawn(function()
 		if anims[char] ~= id then return end
-		wait(self.time)
+		wait(self.time/(tonumber(self.speed) or 1))
 		if anims[char] ~= id then return end
 
 		if self.looped == true then
