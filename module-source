@@ -75,9 +75,9 @@ function module:playv2(welds:{})
 	local threads = {}
 
 	local kfs = data:GetKeyframes()
-	
+
 	self.time = getSequenceLength(data)
-	
+
 	for ind = 0, (#kfs) do
 		local v = kfs[ind]
 
@@ -97,7 +97,7 @@ function module:playv2(welds:{})
 						local easingStyle = (a.EasingStyle or Enum.EasingStyle.Linear)
 						local easingDirection = (a.EasingDirection or Enum.EasingDirection.In)
 
-						local tInfo = TweenInfo.new(timeDiff, Enum.EasingStyle[easingStyle.Name], Enum.EasingDirection[easingDirection.Name])
+						local tInfo = TweenInfo.new(timeDiff, Enum.EasingStyle[(easingStyle.Name == "Constant" and "Linear" or easingStyle.Name)], Enum.EasingDirection[easingDirection.Name])
 
 						tween:Create(d[1], tInfo, {
 							C0 = d[2] * a.CFrame
@@ -110,7 +110,7 @@ function module:playv2(welds:{})
 		end)
 
 	end
-	
+
 	task.spawn(function()
 		if anims[char] ~= id then return end
 		wait(self.time/(tonumber(self.speed) or 1))
@@ -125,7 +125,7 @@ function module:playv2(welds:{})
 		end
 
 	end)
-	
+
 end
 
 
@@ -159,7 +159,7 @@ function module:play(welds:{})
 						local easingStyle = (a.EasingStyle or Enum.EasingStyle.Linear)
 						local easingDirection = (a.EasingDirection or Enum.EasingDirection.In)
 
-						local tInfo = TweenInfo.new(timeDiff, Enum.EasingStyle[easingStyle.Name], Enum.EasingDirection[easingDirection.Name])
+						local tInfo = TweenInfo.new(timeDiff, Enum.EasingStyle[(easingStyle.Name == "Constant" and "Linear" or easingStyle.Name)], Enum.EasingDirection[easingDirection.Name])
 
 						tween:Create(d[1], tInfo, {
 							C0 = d[2] * a.CFrame
@@ -235,14 +235,14 @@ end
 function module.tableToKeyframe(keyframeData:{})
 	local inst = Instance.new("KeyframeSequence")
 	inst.Loop = (keyframeData["l"])
-	
+
 	for time, data in pairs(keyframeData) do
 		if time ~= "l" then
 			local keyfram = Instance.new("Keyframe")
 			keyfram.Time = tonumber(time)
-			
+
 			for a,b in pairs(data) do
-				
+
 				local pose = Instance.new("Pose")
 				pose.Name = a
 				pose.CFrame = b[1]
@@ -250,14 +250,14 @@ function module.tableToKeyframe(keyframeData:{})
 				pose.EasingDirection = Enum.PoseEasingDirection[b[3]]
 				pose.Parent = keyfram
 			end
-			
+
 			keyfram.Parent = inst
-			
+
 		end
 	end
-	
+
 	return inst
-	
+
 	--local main = Instance.new("KeyframeSequence")
 
 	--for time, data in pairs(keyframeData) do
