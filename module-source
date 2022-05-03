@@ -54,6 +54,17 @@ function module:stop(welds:{})
 	end
 end
 
+local function getSequenceLength(keyframeSequence:KeyframeSequence) -- sample from https://developer.roblox.com/en-us/api-reference/property/Keyframe/Time
+	local length = 0
+	for _, keyframe in pairs(keyframeSequence:GetKeyframes()) do 
+		if keyframe.Time > length then 
+			length = keyframe.Time 
+		end
+	end
+	return length
+end
+
+
 function module:playv2(welds:{})
 	welds = welds or self:getWeldsAndC0()
 	local char:Model, data:KeyframeSequence = self.char, self.data
@@ -64,7 +75,9 @@ function module:playv2(welds:{})
 	local threads = {}
 
 	local kfs = data:GetKeyframes()
-
+	
+	self.time = getSequenceLength(data)
+	
 	for ind = 0, (#kfs) do
 		local v = kfs[ind]
 
@@ -90,27 +103,6 @@ function module:playv2(welds:{})
 							C0 = d[2] * a.CFrame
 						}):Play()
 
-						if ind == #kfs then
-							task.spawn(function()
-								if anims[char] ~= id then return end
-								wait(timeDiff)
-								if anims[char] ~= id then return end
-
-								if self.looped == true then
-									if anims[char] ~= id then return end
-									self:play(welds)
-								elseif self.looped == false  and self.autostop == true then
-									if anims[char] ~= id then return end
-									self:stop(welds)
-								end
-
-							end)
-
-							return
-
-						end
-						
-						
 					end
 				end
 			end
@@ -118,8 +110,24 @@ function module:playv2(welds:{})
 		end)
 
 	end
+	
+	task.spawn(function()
+		if anims[char] ~= id then return end
+		wait(self.time)
+		if anims[char] ~= id then return end
 
+		if self.looped == true then
+			if anims[char] ~= id then return end
+			self:play(welds)
+		elseif self.looped == false and self.autostop == true then
+			if anims[char] ~= id then return end
+			self:stop(welds)
+		end
+
+	end)
+	
 end
+
 
 function module:play(welds:{})
 	welds = welds or self:getWeldsAndC0()
@@ -131,6 +139,8 @@ function module:play(welds:{})
 	local threads = {}
 
 	local kfs = data:GetKeyframes()
+
+	self.time = getSequenceLength(data)
 
 	for ind,v in pairs(kfs) do
 		if anims[char] ~= id then return end
@@ -155,25 +165,7 @@ function module:play(welds:{})
 							C0 = d[2] * a.CFrame
 						}):Play()
 
-						if ind == #kfs then
-							task.spawn(function()
-								if anims[char] ~= id then return end
-								wait(timeDiff)
-								if anims[char] ~= id then return end
-								
-								if self.looped == true then
-									if anims[char] ~= id then return end
-									self:play(welds)
-								elseif self.looped == false and self.autostop == true then
-									if anims[char] ~= id then return end
-									self:stop(welds)
-								end
 
-							end)
-
-							return
-
-						end
 					end
 				end
 			end
@@ -181,6 +173,20 @@ function module:play(welds:{})
 		end)
 	end
 
+	task.spawn(function()
+		if anims[char] ~= id then return end
+		wait(self.time)
+		if anims[char] ~= id then return end
+
+		if self.looped == true then
+			if anims[char] ~= id then return end
+			self:play(welds)
+		elseif self.looped == false and self.autostop == true then
+			if anims[char] ~= id then return end
+			self:stop(welds)
+		end
+
+	end)
 end
 
 function module.keyframeToString(keyframeSequence:KeyframeSequence)
@@ -248,7 +254,7 @@ function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{}, 
 			error("Couldn't get keyframesequence.")
 		end
 	end
-	
+
 	local self = {}
 	self.data = keyframeSequence
 	self.char = character
