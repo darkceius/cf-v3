@@ -189,53 +189,97 @@ function module:play(welds:{})
 	end)
 end
 
-function module.keyframeToString(keyframeSequence:KeyframeSequence)
-	local res = "{".. string.format("Properties={Looped=%s};", tostring(keyframeSequence.Loop))
-	local frames = keyframeSequence:GetKeyframes()
 
-	for i: number,v in pairs(frames) do
-		local ks = ""
-		local descendants:{} = v:GetDescendants()
-		for ind,g in pairs(descendants) do
-			if g:IsA("Pose") then
-				local name = string.gsub(g.Name, "'", "\'")
-				local cf = string.format("CFrame.new(%s)", tostring(g.CFrame))
-				local fr = string.format(("['%s']={%s, '%s','%s'}".. ((ind==#descendants) and "" or ";")), name, cf, tostring(g.EasingStyle.Name), tostring(g.EasingDirection.Name))
-				ks = ks .. fr
-			end
-		end
+function round(n, decimals)
+	decimals = decimals or 0
+	return math.floor(n * 10^decimals) / 10^decimals
+end
 
-		local data = string.format(("[%s]={%s}"..(i==#frames and "" or ";")) .. "\n", v.Time, ks)
-		res = res .. data
+function cutCFrame(cf:CFrame)
+	local c = {cf:GetComponents()}
+	local res = {}
+	for i,v in pairs(c) do
+		table.insert(res, round(v, 3))
 	end
+	return string.format("%s",table.concat(res, ","))
+end
 
+function module.keyframeToString(kf:KeyframeSequence)
+	if not kf:IsA("KeyframeSequence") then
+		return "{}"
+	end
+	local res = "local c=CFrame.new; return{"..string.format('["l"]=%s;',tostring(kf.Loop))
+	local current = 0
+	local children = kf:GetChildren();
+	table.sort(children, function(a, b) return a.Time < b.Time end)
+	for index, keyframe in pairs(children) do
+		if keyframe:IsA("Keyframe") then
+			current = round(keyframe.Time, 3)
+
+			res = res .. "\n[".. tostring(current) .. "]={"
+
+			local poses = keyframe:GetDescendants()
+			for i,v in pairs(poses) do
+				if v:IsA("Pose") then
+					res = res .. ('["'..string.format(v.Name, '"','\"') ..'"]={c('.. string.gsub(tostring(cutCFrame(v.CFrame)), " ", "") .. ")" .. string.format(",'%s','%s'", v.EasingStyle.Name,v.EasingDirection.Name)..'}'.. (i == #poses and "" or ";")) 
+				end
+			end
+
+			res = (res .. "}" .. (index == #children and "" or ";"))
+		end
+	end
 	res = res .. "}"
 	return res
 end
 
 function module.tableToKeyframe(keyframeData:{})
-	local main = Instance.new("KeyframeSequence")
-
+	local inst = Instance.new("KeyframeSequence")
+	inst.Loop = (keyframeData["l"])
+	
 	for time, data in pairs(keyframeData) do
-		if tonumber(time) then
-			local a = Instance.new("Keyframe")
-			a.Time = tonumber(time)
-
-			for i,v in pairs(data) do
-				local pose = Instance.new("Pose", a)
-				pose.Name = i
-				pose.CFrame = v[1]
-				pose.EasingStyle = Enum.PoseEasingStyle[v[2]]
-				pose.EasingDirection = Enum.PoseEasingDirection[v[3]]
+		if time ~= "l" then
+			local keyfram = Instance.new("Keyframe")
+			keyfram.Time = tonumber(time)
+			
+			for a,b in pairs(data) do
+				
+				local pose = Instance.new("Pose")
+				pose.Name = a
+				pose.CFrame = b[1]
+				pose.EasingStyle = Enum.PoseEasingStyle[b[2]]
+				pose.EasingDirection = Enum.PoseEasingStyle[b[3]]
+				pose.Parent = keyfram
 			end
-
-			a.Parent = main
-		elseif time == "Properties" then
-			main.Loop = data.Looped
+			
+			keyfram.Parent = inst
+			
 		end
 	end
+	
+	return inst
+	
+	--local main = Instance.new("KeyframeSequence")
 
-	return main
+	--for time, data in pairs(keyframeData) do
+	--	if tonumber(time) then
+	--		local a = Instance.new("Keyframe")
+	--		a.Time = tonumber(time)
+
+	--		for i,v in pairs(data) do
+	--			local pose = Instance.new("Pose", a)
+	--			pose.Name = i
+	--			pose.CFrame = v[1]
+	--			pose.EasingStyle = Enum.PoseEasingStyle v[2]
+	--			pose.EasingDirection = Enum.PoseEasingDirection v[3]
+	--		end
+
+	--		a.Parent = main
+	--	elseif time == "Properties" then
+	--		main.Loop = data.Looped
+	--	end
+	--end
+
+	--return main
 end
 
 function module.new(character: Model, keyframeSequence:KeyframeSequence|any|{}, looped)
