@@ -247,7 +247,7 @@ function module.tableToKeyframe(keyframeData:{})
 				pose.Name = a
 				pose.CFrame = b[1]
 				pose.EasingStyle = Enum.PoseEasingStyle[b[2]]
-				pose.EasingDirection = Enum.PoseEasingStyle[b[3]]
+				pose.EasingDirection = Enum.PoseEasingDirection[b[3]]
 				pose.Parent = keyfram
 			end
 			
