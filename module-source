@@ -29,7 +29,7 @@ function module:getWeldsAndC0()
 	local t = {}
 
 	for i,v: Motor6D in pairs(self.char:GetDescendants()) do
-		if v:IsA("Motor6D") or v:IsA("Weld") then
+		if v:IsA("Motor6D") then
 			local normal = (c0Saves[v] or (function()
 				local a = v.C0
 				c0Saves[v]=a
